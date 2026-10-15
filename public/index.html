@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Housewives Finance Manager — Admin Dashboard for backend API management" />
+  <title>HomeBudget — Backend Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════════════════════ */
+    /*  DESIGN SYSTEM — Premium Dark Glassmorphism Theme         */
+    /* ═══════════════════════════════════════════════════════════ */
+    :root {
+      --bg-primary: #0a0a12;
+      --bg-secondary: #12121e;
+      --bg-card: rgba(22, 22, 38, 0.75);
+      --bg-card-hover: rgba(30, 30, 50, 0.85);
+      --bg-input: rgba(255, 255, 255, 0.04);
+      --bg-input-focus: rgba(255, 255, 255, 0.08);
+      --border-color: rgba(255, 255, 255, 0.06);
+      --border-focus: rgba(139, 92, 246, 0.5);
+      --text-primary: #f0f0f5;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent-purple: #8b5cf6;
+      --accent-purple-glow: rgba(139, 92, 246, 0.25);
+      --accent-pink: #ec4899;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-teal: #14b8a6;
+      --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+      --gradient-secondary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      --gradient-success: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+      --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.15);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Background animated gradient mesh */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+      animation: meshFloat 20s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes meshFloat {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-2%, 3%) rotate(1deg); }
+      50% { transform: translate(1%, -2%) rotate(-1deg); }
+      75% { transform: translate(3%, 1%) rotate(0.5deg); }
+    }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.5); }
+
+    /* ─── Layout ─── */
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* ─── Header ─── */
+    .header {
+      text-align: center;
+      padding: 48px 24px 32px;
+      position: relative;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent-purple);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(12px);
+    }
+
+    .header-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    /* ─── API Base URL Bar ─── */
+    .api-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 12px 20px;
+      margin: 24px auto 32px;
+      max-width: 600px;
+      backdrop-filter: blur(12px);
+    }
+
+    .api-bar label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-purple);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .api-bar input {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-family: 'Inter', monospace;
+      font-size: 13px;
+      transition: var(--transition);
+    }
+
+    .api-bar input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      background: var(--bg-input-focus);
+    }
+
+    /* ─── Navigation Tabs ─── */
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .nav-tab {
+      padding: 10px 20px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: var(--transition);
+      backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-tab:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+      border-color: rgba(139, 92, 246, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .nav-tab.active {
+      background: var(--gradient-primary);
+      color: white;
+      border-color: transparent;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .nav-tab .tab-icon { margin-right: 6px; }
+
+    /* ─── Section Panels ─── */
+    .section-panel {
+      display: none;
+      animation: fadeSlideIn 0.4s ease-out;
+    }
+
+    .section-panel.active { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(16px);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+    }
+
+    .card:hover {
+      border-color: rgba(139, 92, 246, 0.15);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+
+    .card-title .icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .card-endpoint {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-family: 'Inter', monospace;
+      color: var(--accent-purple);
+      margin-bottom: 20px;
+    }
+
+    .card-endpoint .method {
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+
+    .method-post { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+    .method-get { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+    .method-put { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
+    .method-delete { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+
+    /* ─── Forms ─── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full-width { grid-column: 1 / -1; }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      background: var(--bg-input-focus);
+      box-shadow: 0 0 0 3px var(--accent-purple-glow);
+    }
+
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-select { cursor: pointer; }
+    .form-select option { background: var(--bg-secondary); color: var(--text-primary); }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 24px rgba(139, 92, 246, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--gradient-secondary);
+      color: white;
+      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-success {
+      background: var(--gradient-success);
+      color: white;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-warning {
+      background: var(--gradient-warm);
+      color: white;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-ghost {
+      background: var(--bg-input);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-input-focus);
+      color: var(--text-primary);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ─── Response Panel ─── */
+    .response-panel {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .response-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .response-header .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .status-success { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+    .status-error { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+    .status-pending { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+
+    .response-body {
+      padding: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Inter', 'Fira Code', monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ─── Auth Token Bar ─── */
+    .token-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      margin: 0 auto 32px;
+      max-width: 800px;
+    }
+
+    .token-bar label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-green);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .token-bar input {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-family: 'Inter', monospace;
+      font-size: 12px;
+      transition: var(--transition);
+    }
+
+    .token-bar input:focus {
+      outline: none;
+      border-color: rgba(16, 185, 129, 0.4);
+      background: var(--bg-input-focus);
+    }
+
+    /* ─── Grid Layouts ─── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 24px;
+    }
+
+    .cards-grid-full {
+      grid-template-columns: 1fr;
+    }
+
+    /* ─── Helpers ─── */
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+    .mb-16 { margin-bottom: 16px; }
+    .text-center { text-align: center; }
+
+    .divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 24px 0;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ─── Toast Notification ─── */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-md);
+      animation: toastIn 0.3s ease-out;
+      max-width: 360px;
+      border: 1px solid;
+    }
+
+    .toast-success {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .toast-error {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-red);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      .app-container { padding: 12px; }
+      .header h1 { font-size: 26px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .api-bar, .token-bar { flex-direction: column; align-items: stretch; }
+      .nav-tabs { gap: 4px; }
+      .nav-tab { padding: 8px 14px; font-size: 12px; }
+    }
+
+    /* ─── File Input ─── */
+    .file-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: var(--bg-input);
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .file-input-label:hover {
+      border-color: var(--accent-purple);
+      color: var(--accent-purple);
+    }
+
+    .file-name {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ─── Footer ─── */
+    .footer {
+      text-align: center;
+      padding: 48px 24px 32px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .footer a {
+      color: var(--accent-purple);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="app-container">
+
+    <!-- ═══════ HEADER ═══════ -->
+    <header class="header">
+      <div class="header-badge"><span class="dot"></span> Admin Panel</div>
+      <h1>🏠 HomeBudget Backend</h1>
+      <p>API Dashboard — Housewives Finance Manager</p>
+    </header>
+
+    <!-- ═══════ API BASE URL ═══════ -->
+    <div class="api-bar">
+      <label>🔗 Base URL</label>
+      <input type="text" id="apiBaseUrl" value="http://localhost:4000" placeholder="http://localhost:4000" />
+    </div>
+
+    <!-- ═══════ TOKEN BAR ═══════ -->
+    <div class="token-bar">
+      <label>🔑 JWT Token</label>
+      <input type="text" id="authToken" placeholder="Login/Register karke token yahan paste karein ya auto-fill hoga..." />
+    </div>
+
+    <!-- ═══════ NAVIGATION TABS ═══════ -->
+    <nav class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" data-section="auth" onclick="switchTab('auth')">
+        <span class="tab-icon">🔐</span> Auth
+      </button>
+      <button class="nav-tab" data-section="user" onclick="switchTab('user')">
+        <span class="tab-icon">👤</span> User
+      </button>
+      <button class="nav-tab" data-section="expenses" onclick="switchTab('expenses')">
+        <span class="tab-icon">💸</span> Expenses
+      </button>
+      <button class="nav-tab" data-section="reminders" onclick="switchTab('reminders')">
+        <span class="tab-icon">🔔</span> Reminders
+      </button>
+      <button class="nav-tab" data-section="analytics" onclick="switchTab('analytics')">
+        <span class="tab-icon">📊</span> Analytics
+      </button>
+      <button class="nav-tab" data-section="savings" onclick="switchTab('savings')">
+        <span class="tab-icon">🐷</span> Savings
+      </button>
+    </nav>
+
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <!--  SECTION: AUTH                                           -->
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <div class="section-panel active" id="section-auth">
+      <h2 class="section-title">🔐 Authentication APIs</h2>
+
+      <div class="cards-grid">
+
+        <!-- Register Request (OTP) -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">📝</div>
+            Register (OTP Flow)
+          </div>
+          <div class="card-subtitle">Register karna hai? Name, Email aur Password daalein — OTP email pe aayega</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/auth/register-request</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input class="form-input" type="text" id="reg-name" placeholder="Apna naam likhein" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="reg-email" placeholder="email@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input class="form-input" type="password" id="reg-password" placeholder="Password likhein" />
+            </div>
+          </div>
+          <button class="btn btn-success" id="btn-register-request" onclick="registerRequest()">📨 Send OTP</button>
+          <div class="response-panel mt-16" id="resp-register-request" style="display:none;"></div>
+        </div>
+
+        <!-- Verify Register OTP -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(139,92,246,0.15); color: var(--accent-purple);">✅</div>
+            Verify Register OTP
+          </div>
+          <div class="card-subtitle">Email pe aaya OTP yahan daalein — Account ban jaayega</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/auth/verify-register-otp</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="verify-reg-email" placeholder="Wahi email daalein" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">OTP Code</label>
+              <input class="form-input" type="text" id="verify-reg-otp" placeholder="6-digit OTP" maxlength="6" />
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="verifyRegisterOtp()">✅ Verify & Create Account</button>
+          <div class="response-panel mt-16" id="resp-verify-register" style="display:none;"></div>
+        </div>
+
+        <!-- Direct Register -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(59,130,246,0.15); color: var(--accent-blue);">⚡</div>
+            Quick Register (Without OTP)
+          </div>
+          <div class="card-subtitle">Seedha register — Bina OTP ke account banaayein</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/auth/register</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Email / Phone</label>
+              <input class="form-input" type="text" id="quick-reg-email" placeholder="email@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password (Optional)</label>
+              <input class="form-input" type="password" id="quick-reg-pass" placeholder="Password" />
+            </div>
+          </div>
+          <button class="btn btn-secondary" onclick="quickRegister()">⚡ Register</button>
+          <div class="response-panel mt-16" id="resp-quick-register" style="display:none;"></div>
+        </div>
+
+        <!-- Login -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(236,72,153,0.15); color: var(--accent-pink);">🔑</div>
+            Login
+          </div>
+          <div class="card-subtitle">Existing account se login karein</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/auth/login</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Email / Phone</label>
+              <input class="form-input" type="text" id="login-email" placeholder="email@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input class="form-input" type="password" id="login-password" placeholder="Password" />
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="loginUser()">🔑 Login</button>
+          <div class="response-panel mt-16" id="resp-login" style="display:none;"></div>
+        </div>
+
+        <!-- Send Email OTP -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(245,158,11,0.15); color: var(--accent-amber);">📧</div>
+            Send Email OTP
+          </div>
+          <div class="card-subtitle">Email verification ke liye OTP bhejein</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/auth/send-otp</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="send-otp-email" placeholder="email@example.com" />
+            </div>
+          </div>
+          <button class="btn btn-warning" onclick="sendEmailOtp()">📧 Send OTP</button>
+          <div class="response-panel mt-16" id="resp-send-otp" style="display:none;"></div>
+        </div>
+
+        <!-- Verify Email OTP -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(20,184,166,0.15); color: var(--accent-teal);">🔓</div>
+            Verify Email OTP
+          </div>
+          <div class="card-subtitle">Email pe aaya OTP verify karein</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/auth/verify-otp</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="verify-otp-email" placeholder="email@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">OTP Code</label>
+              <input class="form-input" type="text" id="verify-otp-code" placeholder="6-digit OTP" maxlength="6" />
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="verifyEmailOtp()">🔓 Verify OTP</button>
+          <div class="response-panel mt-16" id="resp-verify-otp" style="display:none;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <!--  SECTION: USER                                           -->
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <div class="section-panel" id="section-user">
+      <h2 class="section-title">👤 User APIs</h2>
+
+      <div class="cards-grid">
+
+        <!-- Get Profile -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(59,130,246,0.15); color: var(--accent-blue);">📋</div>
+            Get Profile
+          </div>
+          <div class="card-subtitle">Apna profile data dekhein</div>
+          <div class="card-endpoint"><span class="method method-get">GET</span> /api/user/profile</div>
+          <button class="btn btn-secondary" onclick="getUserProfile()">📋 Fetch Profile</button>
+          <div class="response-panel mt-16" id="resp-profile" style="display:none;"></div>
+        </div>
+
+        <!-- Update Profile -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(139,92,246,0.15); color: var(--accent-purple);">✏️</div>
+            Update Profile
+          </div>
+          <div class="card-subtitle">Profile mein naam, budget, language wagairah update karein</div>
+          <div class="card-endpoint"><span class="method method-put">PUT</span> /api/user/profile</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input class="form-input" type="text" id="upd-name" placeholder="Apna naam" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monthly Budget (₹)</label>
+              <input class="form-input" type="number" id="upd-budget" placeholder="25000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Language</label>
+              <select class="form-select" id="upd-lang">
+                <option value="en">English</option>
+                <option value="hi">हिंदी (Hindi)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Savings Goal Name</label>
+              <input class="form-input" type="text" id="upd-savings-name" placeholder="e.g. Bacchon ki padhai" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Savings Target (₹)</label>
+              <input class="form-input" type="number" id="upd-savings-target" placeholder="50000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Savings Achieved (₹)</label>
+              <input class="form-input" type="number" id="upd-savings-achieved" placeholder="10000" />
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="updateProfile()">✏️ Update Profile</button>
+          <div class="response-panel mt-16" id="resp-update-profile" style="display:none;"></div>
+        </div>
+
+        <!-- Onboard User -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">🚀</div>
+            Complete Onboarding
+          </div>
+          <div class="card-subtitle">Pehli baar user ka onboarding complete karein</div>
+          <div class="card-endpoint"><span class="method method-put">PUT</span> /api/user/complete-onboarding</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input class="form-input" type="text" id="onb-name" placeholder="Naam" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monthly Budget (₹)</label>
+              <input class="form-input" type="number" id="onb-budget" placeholder="25000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Language</label>
+              <select class="form-select" id="onb-lang">
+                <option value="en">English</option>
+                <option value="hi">हिंदी (Hindi)</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="completeOnboarding()">🚀 Complete Onboarding</button>
+          <div class="response-panel mt-16" id="resp-onboarding" style="display:none;"></div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(239,68,68,0.15); color: var(--accent-red);">🔒</div>
+            Change Password
+          </div>
+          <div class="card-subtitle">Password badlein</div>
+          <div class="card-endpoint"><span class="method method-put">PUT</span> /api/user/change-password</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Current Password</label>
+              <input class="form-input" type="password" id="chg-current-pass" placeholder="Purana password" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input class="form-input" type="password" id="chg-new-pass" placeholder="Naya password" />
+            </div>
+          </div>
+          <button class="btn btn-warning" onclick="changePassword()">🔒 Change Password</button>
+          <div class="response-panel mt-16" id="resp-change-pass" style="display:none;"></div>
+        </div>
+
+        <!-- Spin Wheel -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(245,158,11,0.15); color: var(--accent-amber);">🎡</div>
+            Spin Reward Wheel
+          </div>
+          <div class="card-subtitle">Daily reward wheel spin karein — Points jeeten!</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/user/spin-wheel</div>
+          <button class="btn btn-warning" onclick="spinWheel()">🎡 Spin!</button>
+          <div class="response-panel mt-16" id="resp-spin" style="display:none;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <!--  SECTION: EXPENSES                                       -->
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <div class="section-panel" id="section-expenses">
+      <h2 class="section-title">💸 Expense APIs</h2>
+
+      <div class="cards-grid">
+
+        <!-- Add Expense -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">➕</div>
+            Add Expense / Income
+          </div>
+          <div class="card-subtitle">Naya kharcha ya income entry daalein</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/expenses</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Item Name</label>
+              <input class="form-input" type="text" id="exp-item" placeholder="e.g. Sabzi, Doodh, Bijli Bill" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (₹)</label>
+              <input class="form-input" type="number" id="exp-amount" placeholder="200" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="exp-category">
+                <option value="Groceries">🥦 Groceries</option>
+                <option value="Utilities">💡 Utilities</option>
+                <option value="Dining">🍽️ Dining</option>
+                <option value="Travel">🚗 Travel</option>
+                <option value="Rent">🏠 Rent</option>
+                <option value="Others">📦 Others</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Type</label>
+              <select class="form-select" id="exp-type">
+                <option value="debit">💳 Debit (Kharcha)</option>
+                <option value="credit">💰 Credit (Income)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input class="form-input" type="date" id="exp-date" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes</label>
+              <input class="form-input" type="text" id="exp-notes" placeholder="Kuch note likhein (optional)" />
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="addExpense()">➕ Add Transaction</button>
+          <div class="response-panel mt-16" id="resp-add-expense" style="display:none;"></div>
+        </div>
+
+        <!-- Get Monthly Expenses -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(59,130,246,0.15); color: var(--accent-blue);">📅</div>
+            Monthly Summary
+          </div>
+          <div class="card-subtitle">Is mahine ka poora kharcha summary dekhein</div>
+          <div class="card-endpoint"><span class="method method-get">GET</span> /api/expenses/monthly</div>
+          <button class="btn btn-secondary" onclick="getMonthlyExpenses()">📅 Fetch Monthly Data</button>
+          <div class="response-panel mt-16" id="resp-monthly" style="display:none;"></div>
+        </div>
+
+        <!-- Voice Parse -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(236,72,153,0.15); color: var(--accent-pink);">🎤</div>
+            Voice Parse Expense
+          </div>
+          <div class="card-subtitle">Hindi/English mein bolein — AI samajh ke data nikalega</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/expenses/voice-parse</div>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label">Voice Text</label>
+              <input class="form-input" type="text" id="voice-text" placeholder="e.g. '200 rupaye doodh ko diye' ya 'Paid 500 for electricity bill'" />
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="voiceParseExpense()">🎤 Parse Text</button>
+          <div class="response-panel mt-16" id="resp-voice" style="display:none;"></div>
+        </div>
+
+        <!-- Scan Bill -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(245,158,11,0.15); color: var(--accent-amber);">📸</div>
+            Scan Bill / Receipt
+          </div>
+          <div class="card-subtitle">Bill ki photo upload karein — OCR se data niklega</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/expenses/scan-bill</div>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label">Bill Image</label>
+              <div class="file-input-wrapper">
+                <input type="file" id="bill-file" accept="image/*" onchange="updateFileName('bill-file', 'bill-file-name')" />
+                <div class="file-input-label">📷 Photo Choose Karein</div>
+                <span class="file-name" id="bill-file-name">Koi file nahi chuni</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-warning" onclick="scanBill()">📸 Scan Bill</button>
+          <div class="response-panel mt-16" id="resp-scan-bill" style="display:none;"></div>
+        </div>
+
+        <!-- Scan Diary -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(139,92,246,0.15); color: var(--accent-purple);">📓</div>
+            Scan Diary / Notebook
+          </div>
+          <div class="card-subtitle">Haath se likhi diary ka photo upload karein — AI sab entries nikalega</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/expenses/scan-diary</div>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label">Diary Page Image</label>
+              <div class="file-input-wrapper">
+                <input type="file" id="diary-file" accept="image/*" onchange="updateFileName('diary-file', 'diary-file-name')" />
+                <div class="file-input-label">📓 Diary Photo Choose Karein</div>
+                <span class="file-name" id="diary-file-name">Koi file nahi chuni</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="scanDiary()">📓 Scan Diary</button>
+          <div class="response-panel mt-16" id="resp-scan-diary" style="display:none;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <!--  SECTION: REMINDERS                                      -->
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <div class="section-panel" id="section-reminders">
+      <h2 class="section-title">🔔 Reminder APIs</h2>
+
+      <div class="cards-grid">
+
+        <!-- Add Reminder -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(16,185,129,0.15); color: var(--accent-green);">➕</div>
+            Add Bill Reminder
+          </div>
+          <div class="card-subtitle">Monthly bill ka reminder set karein</div>
+          <div class="card-endpoint"><span class="method method-post">POST</span> /api/reminders</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Bill Title</label>
+              <input class="form-input" type="text" id="rem-title" placeholder="e.g. Bijli Bill, WiFi, Rent" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (₹)</label>
+              <input class="form-input" type="number" id="rem-amount" placeholder="2000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Due Date</label>
+              <input class="form-input" type="date" id="rem-due-date" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="rem-category">
+                <option value="Utilities">💡 Utilities</option>
+                <option value="Rent">🏠 Rent</option>
+                <option value="Groceries">🥦 Groceries</option>
+                <option value="Others">📦 Others</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="addReminder()">➕ Add Reminder</button>
+          <div class="response-panel mt-16" id="resp-add-reminder" style="display:none;"></div>
+        </div>
+
+        <!-- Get Reminders -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(59,130,246,0.15); color: var(--accent-blue);">📋</div>
+            Get Active Reminders
+          </div>
+          <div class="card-subtitle">Is mahine ke unpaid bills dekhein</div>
+          <div class="card-endpoint"><span class="method method-get">GET</span> /api/reminders</div>
+          <button class="btn btn-secondary" onclick="getReminders()">📋 Fetch Reminders</button>
+          <div class="response-panel mt-16" id="resp-get-reminders" style="display:none;"></div>
+        </div>
+
+        <!-- Pay Reminder -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(245,158,11,0.15); color: var(--accent-amber);">💳</div>
+            Pay Bill / Mark Paid
+          </div>
+          <div class="card-subtitle">Bill ko paid mark karein — automatic expense log hoga</div>
+          <div class="card-endpoint"><span class="method method-put">PUT</span> /api/reminders/:id/pay</div>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label">Reminder ID (UUID)</label>
+              <input class="form-input" type="text" id="pay-reminder-id" placeholder="reminderId UUID yahan paste karein" />
+            </div>
+          </div>
+          <button class="btn btn-warning" onclick="payReminder()">💳 Mark as Paid</button>
+          <div class="response-panel mt-16" id="resp-pay-reminder" style="display:none;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <!--  SECTION: ANALYTICS                                      -->
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <div class="section-panel" id="section-analytics">
+      <h2 class="section-title">📊 Analytics APIs</h2>
+
+      <div class="cards-grid">
+
+        <!-- Category Breakdown -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(139,92,246,0.15); color: var(--accent-purple);">🥧</div>
+            Category Breakdown
+          </div>
+          <div class="card-subtitle">Category-wise kharcha breakdown dekhein — percentage ke saath</div>
+          <div class="card-endpoint"><span class="method method-get">GET</span> /api/analytics/category-breakdown</div>
+          <button class="btn btn-primary" onclick="getCategoryBreakdown()">🥧 Get Breakdown</button>
+          <div class="response-panel mt-16" id="resp-breakdown" style="display:none;"></div>
+        </div>
+
+        <!-- Price History -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(20,184,166,0.15); color: var(--accent-teal);">📈</div>
+            Item Price History
+          </div>
+          <div class="card-subtitle">Kisi bhi item ka monthly price history dekhein</div>
+          <div class="card-endpoint"><span class="method method-get">GET</span> /api/analytics/price-history</div>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label">Item Name</label>
+              <input class="form-input" type="text" id="price-item" placeholder="e.g. Doodh, Sabzi, Paneer" />
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="getPriceHistory()">📈 Get History</button>
+          <div class="response-panel mt-16" id="resp-price-history" style="display:none;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <!--  SECTION: SAVINGS                                        -->
+    <!-- ═════════════════════════════════════════════════════════ -->
+    <div class="section-panel" id="section-savings">
+      <h2 class="section-title">🐷 Savings / Gullak APIs</h2>
+
+      <div class="cards-grid">
+
+        <!-- Gullak Balance -->
+        <div class="card">
+          <div class="card-title">
+            <div class="icon" style="background: rgba(245,158,11,0.15); color: var(--accent-amber);">🐷</div>
+            Gullak Balance
+          </div>
+          <div class="card-subtitle">Mahine ka bacha hua paisa dekhein — Gullak mein kitna gaya</div>
+          <div class="card-endpoint"><span class="method method-get">GET</span> /api/savings/gullak</div>
+          <button class="btn btn-warning" onclick="getGullakBalance()">🐷 Check Gullak</button>
+          <div class="response-panel mt-16" id="resp-gullak" style="display:none;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════ FOOTER ═══════ -->
+    <footer class="footer">
+      <p>HomeBudget Backend Admin Panel — Built with ❤️ for Housewives Finance Manager</p>
+    </footer>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!--  JAVASCRIPT                                                -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <script>
+    // ─── Helpers ──────────────────────────────────────────────────
+    const getBase = () => document.getElementById('apiBaseUrl').value.replace(/\/+$/, '');
+    const getToken = () => document.getElementById('authToken').value.trim();
+
+    function setToken(token) {
+      if (token) {
+        document.getElementById('authToken').value = token;
+        showToast('🔑 Token auto-filled!', 'success');
+      }
+    }
+
+    function headers(isJson = true) {
+      const h = {};
+      if (isJson) h['Content-Type'] = 'application/json';
+      const token = getToken();
+      if (token) h['Authorization'] = `Bearer ${token}`;
+      return h;
+    }
+
+    // ─── Tab Switching ───────────────────────────────────────────
+    function switchTab(sectionId) {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section-panel').forEach(s => s.classList.remove('active'));
+      document.querySelector(`.nav-tab[data-section="${sectionId}"]`).classList.add('active');
+      document.getElementById(`section-${sectionId}`).classList.add('active');
+    }
+
+    // ─── Toast ───────────────────────────────────────────────────
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(40px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // ─── Response Display ────────────────────────────────────────
+    function showResponse(panelId, data, isSuccess = true) {
+      const panel = document.getElementById(panelId);
+      panel.style.display = 'block';
+      const statusClass = isSuccess ? 'status-success' : 'status-error';
+      const statusText = isSuccess ? '✅ Success' : '❌ Error';
+      panel.innerHTML = `
+        <div class="response-header">
+          <span class="status-badge ${statusClass}">${statusText}</span>
+          <span style="font-size:11px; color: var(--text-muted);">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="response-body">${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}</div>
+      `;
+    }
+
+    // ─── API Call Helper ─────────────────────────────────────────
+    async function apiCall(method, path, body, responsePanelId) {
+      try {
+        const opts = { method, headers: headers(!(body instanceof FormData)) };
+        if (body) {
+          if (body instanceof FormData) {
+            delete opts.headers['Content-Type'];
+            const token = getToken();
+            if (token) opts.headers = { 'Authorization': `Bearer ${token}` };
+            opts.body = body;
+          } else {
+            opts.body = JSON.stringify(body);
+          }
+        }
+        const res = await fetch(`${getBase()}${path}`, opts);
+        const json = await res.json();
+        showResponse(responsePanelId, json, res.ok);
+        if (res.ok) showToast('✅ Request successful!', 'success');
+        else showToast(`❌ ${json.message || 'Request failed'}`, 'error');
+        return json;
+      } catch (err) {
+        showResponse(responsePanelId, { error: err.message }, false);
+        showToast(`❌ ${err.message}`, 'error');
+        return null;
+      }
+    }
+
+    // ─── File Name Display ───────────────────────────────────────
+    function updateFileName(inputId, displayId) {
+      const input = document.getElementById(inputId);
+      const display = document.getElementById(displayId);
+      display.textContent = input.files.length > 0 ? input.files[0].name : 'Koi file nahi chuni';
+    }
+
+    // ─── Set today as default date ───────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      dateInputs.forEach(input => { if (!input.value) input.value = today; });
+    });
+
+    // ═════════════════════════════════════════════════════════════
+    //  AUTH API Functions
+    // ═════════════════════════════════════════════════════════════
+
+    async function registerRequest() {
+      const data = await apiCall('POST', '/api/auth/register-request', {
+        name: document.getElementById('reg-name').value,
+        email: document.getElementById('reg-email').value,
+        password: document.getElementById('reg-password').value
+      }, 'resp-register-request');
+    }
+
+    async function verifyRegisterOtp() {
+      const data = await apiCall('POST', '/api/auth/verify-register-otp', {
+        email: document.getElementById('verify-reg-email').value,
+        otp: document.getElementById('verify-reg-otp').value
+      }, 'resp-verify-register');
+      if (data && data.token) setToken(data.token);
+    }
+
+    async function quickRegister() {
+      const data = await apiCall('POST', '/api/auth/register', {
+        email: document.getElementById('quick-reg-email').value,
+        password: document.getElementById('quick-reg-pass').value
+      }, 'resp-quick-register');
+      if (data && data.token) setToken(data.token);
+    }
+
+    async function loginUser() {
+      const data = await apiCall('POST', '/api/auth/login', {
+        email: document.getElementById('login-email').value,
+        password: document.getElementById('login-password').value
+      }, 'resp-login');
+      if (data && data.token) setToken(data.token);
+    }
+
+    async function sendEmailOtp() {
+      await apiCall('POST', '/api/auth/send-otp', {
+        email: document.getElementById('send-otp-email').value
+      }, 'resp-send-otp');
+    }
+
+    async function verifyEmailOtp() {
+      const data = await apiCall('POST', '/api/auth/verify-otp', {
+        email: document.getElementById('verify-otp-email').value,
+        otp: document.getElementById('verify-otp-code').value
+      }, 'resp-verify-otp');
+      if (data && data.token) setToken(data.token);
+    }
+
+    // ═════════════════════════════════════════════════════════════
+    //  USER API Functions
+    // ═════════════════════════════════════════════════════════════
+
+    async function getUserProfile() {
+      await apiCall('GET', '/api/user/profile', null, 'resp-profile');
+    }
+
+    async function updateProfile() {
+      const body = {};
+      const name = document.getElementById('upd-name').value;
+      const budget = document.getElementById('upd-budget').value;
+      const lang = document.getElementById('upd-lang').value;
+      const sName = document.getElementById('upd-savings-name').value;
+      const sTarget = document.getElementById('upd-savings-target').value;
+      const sAchieved = document.getElementById('upd-savings-achieved').value;
+      if (name) body.name = name;
+      if (budget) body.monthlyBudget = Number(budget);
+      if (lang) body.preferredLanguage = lang;
+      if (sName) body.savingsName = sName;
+      if (sTarget) body.savingsTarget = Number(sTarget);
+      if (sAchieved) body.savingsAchieved = Number(sAchieved);
+      await apiCall('PUT', '/api/user/profile', body, 'resp-update-profile');
+    }
+
+    async function completeOnboarding() {
+      await apiCall('PUT', '/api/user/complete-onboarding', {
+        name: document.getElementById('onb-name').value,
+        monthlyBudget: Number(document.getElementById('onb-budget').value),
+        preferredLanguage: document.getElementById('onb-lang').value
+      }, 'resp-onboarding');
+    }
+
+    async function changePassword() {
+      await apiCall('PUT', '/api/user/change-password', {
+        currentPassword: document.getElementById('chg-current-pass').value,
+        newPassword: document.getElementById('chg-new-pass').value
+      }, 'resp-change-pass');
+    }
+
+    async function spinWheel() {
+      await apiCall('POST', '/api/user/spin-wheel', {}, 'resp-spin');
+    }
+
+    // ═════════════════════════════════════════════════════════════
+    //  EXPENSE API Functions
+    // ═════════════════════════════════════════════════════════════
+
+    async function addExpense() {
+      await apiCall('POST', '/api/expenses', {
+        itemName: document.getElementById('exp-item').value,
+        amount: Number(document.getElementById('exp-amount').value),
+        category: document.getElementById('exp-category').value,
+        type: document.getElementById('exp-type').value,
+        date: document.getElementById('exp-date').value,
+        notes: document.getElementById('exp-notes').value
+      }, 'resp-add-expense');
+    }
+
+    async function getMonthlyExpenses() {
+      await apiCall('GET', '/api/expenses/monthly', null, 'resp-monthly');
+    }
+
+    async function voiceParseExpense() {
+      await apiCall('POST', '/api/expenses/voice-parse', {
+        text: document.getElementById('voice-text').value
+      }, 'resp-voice');
+    }
+
+    async function scanBill() {
+      const file = document.getElementById('bill-file').files[0];
+      if (!file) { showToast('❌ Pehle file choose karein!', 'error'); return; }
+      const formData = new FormData();
+      formData.append('bill', file);
+      await apiCall('POST', '/api/expenses/scan-bill', formData, 'resp-scan-bill');
+    }
+
+    async function scanDiary() {
+      const file = document.getElementById('diary-file').files[0];
+      if (!file) { showToast('❌ Pehle file choose karein!', 'error'); return; }
+      const formData = new FormData();
+      formData.append('diary', file);
+      await apiCall('POST', '/api/expenses/scan-diary', formData, 'resp-scan-diary');
+    }
+
+    // ═════════════════════════════════════════════════════════════
+    //  REMINDER API Functions
+    // ═════════════════════════════════════════════════════════════
+
+    async function addReminder() {
+      await apiCall('POST', '/api/reminders', {
+        title: document.getElementById('rem-title').value,
+        amount: Number(document.getElementById('rem-amount').value),
+        dueDate: document.getElementById('rem-due-date').value,
+        category: document.getElementById('rem-category').value
+      }, 'resp-add-reminder');
+    }
+
+    async function getReminders() {
+      await apiCall('GET', '/api/reminders', null, 'resp-get-reminders');
+    }
+
+    async function payReminder() {
+      const id = document.getElementById('pay-reminder-id').value.trim();
+      if (!id) { showToast('❌ Reminder ID daalein!', 'error'); return; }
+      await apiCall('PUT', `/api/reminders/${id}/pay`, {}, 'resp-pay-reminder');
+    }
+
+    // ═════════════════════════════════════════════════════════════
+    //  ANALYTICS API Functions
+    // ═════════════════════════════════════════════════════════════
+
+    async function getCategoryBreakdown() {
+      await apiCall('GET', '/api/analytics/category-breakdown', null, 'resp-breakdown');
+    }
+
+    async function getPriceHistory() {
+      const item = document.getElementById('price-item').value.trim();
+      if (!item) { showToast('❌ Item name daalein!', 'error'); return; }
+      await apiCall('GET', `/api/analytics/price-history?itemName=${encodeURIComponent(item)}`, null, 'resp-price-history');
+    }
+
+    // ═════════════════════════════════════════════════════════════
+    //  SAVINGS API Functions
+    // ═════════════════════════════════════════════════════════════
+
+    async function getGullakBalance() {
+      await apiCall('GET', '/api/savings/gullak', null, 'resp-gullak');
+    }
+  </script>
+
+</body>
+</html>

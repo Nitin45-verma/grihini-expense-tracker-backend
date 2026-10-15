@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const { errorHandler } = require('./middleware/errorMiddleware');
@@ -19,6 +20,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Serve Admin Dashboard static files
+app.use(express.static(path.join(__dirname, 'public')));
+
 if (process.env.NODE_ENV !== 'production') {
   app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
@@ -32,6 +36,11 @@ app.use('/api/expenses', require('./routes/expenseRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/reminders', require('./routes/reminderRoutes'));
 app.use('/api/savings', require('./routes/savingsRoutes'));
+
+// Admin Dashboard
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Root Endpoint for health check
 app.get('/health', (req, res) => {

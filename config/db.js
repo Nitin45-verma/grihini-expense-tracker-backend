@@ -11,7 +11,8 @@ const connectDB = async () => {
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`);
     console.error(`Attempted URI: ${(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/housewives').replace(/:\/\/.*@/, '://<credentials>@')}`);
-    process.exit(1);
+    console.warn('⚠️  Server will start without DB — Admin panel accessible but API calls will fail until DB reconnects.');
+    // Don't exit; let the Express server start so the admin dashboard is still accessible
   }
 };
 
